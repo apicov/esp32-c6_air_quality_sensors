@@ -52,6 +52,7 @@ class I2C_LCD
         void write_char(uint8_t data);
         void write_string(char *data);
         void set_cursor(uint8_t row, uint8_t col);
+        void clear();
         ~I2C_LCD();
     private:
         PCF8574 *o_port_;

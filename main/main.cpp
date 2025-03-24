@@ -53,7 +53,8 @@ extern "C" void app_main(void)
 void test_task(void *p)
 {
     I2C_LCD lcd(bus_handle, 0x27);
-
+    lcd.set_cursor(1, 0);
+    lcd.write_string("Hello World!");
     while(1) {
         vTaskDelay(pdMS_TO_TICKS(500));
     }

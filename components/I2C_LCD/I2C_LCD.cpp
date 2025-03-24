@@ -27,12 +27,36 @@ I2C_LCD::I2C_LCD(i2c_master_bus_handle_t bus_handle, uint8_t address)
     lcd_send_cmd(LCD_DISPLAY_ON);
     ets_delay_us(100);
 
-	lcd_send_cmd(0x0E);
-    ets_delay_us(100);
+	//lcd_send_cmd(0x0E);
+    //ets_delay_us(100);
 
     ESP_LOGI("I2C_LCD", "LCD initialized");
-    set_cursor(1, 15);
-    lcd_send_char('F');
+}
+
+void I2C_LCD::write_char(uint8_t data)
+{
+    lcd_send_char(data);
+}
+
+void I2C_LCD::write_string(char *data)
+{
+    int idx = 0;
+
+    while(data[idx]) {
+        lcd_send_char(data[idx]);
+        idx++;
+    }
+}
+
+void I2C_LCD::clear()
+{
+    lcd_send_cmd(LCD_CLEAR);
+}
+
+void I2C_LCD::set_cursor(uint8_t row, uint8_t col)
+{
+    uint8_t row_offsets[] = {LCD_LINEONE, LCD_LINETWO, LCD_LINETHREE, LCD_LINEFOUR};
+    lcd_send_cmd(LCD_SET_DDRAM_ADDR | (col + row_offsets[row]));
 }
 
 I2C_LCD::~I2C_LCD()
@@ -68,9 +92,4 @@ void I2C_LCD::lcd_send_enable_pulse()
     ets_delay_us(1);
     o_port_->set_pin(LCD_E, 0);
     ets_delay_us(500);
-}
-void I2C_LCD::set_cursor(uint8_t row, uint8_t col)
-{
-    uint8_t row_offsets[] = {LCD_LINEONE, LCD_LINETWO, LCD_LINETHREE, LCD_LINEFOUR};
-    lcd_send_cmd(LCD_SET_DDRAM_ADDR | (col + row_offsets[row]));
 }

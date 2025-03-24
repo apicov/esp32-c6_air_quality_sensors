@@ -5,7 +5,7 @@
 .vscode/ipch
 .DS_Store
 build
-components
+#components
 managed_components
 private_data.h
 sdkconfig.esp32dev.old

@@ -55,12 +55,10 @@ void PCF8574::write_msb_nibble(uint8_t nibble)
 void PCF8574::set_pin(uint8_t pin, bool value)
 {
     uint8_t data = last_written_;
-    if (value)
-    {
+    if (value) {
         data |= 1 << pin;
     }
-    else
-    {
+    else {
         data &= ~(1 << pin);
     }
     ESP_ERROR_CHECK(i2c_master_transmit(dev_handle_, &data, 1, -1));

@@ -23,5 +23,4 @@ class PCF8574
         uint8_t last_written_ = 0xFF;
         i2c_master_bus_handle_t bus_handle_;
         i2c_master_dev_handle_t dev_handle_;
-        i2c_port_num_t port_num_;
 };

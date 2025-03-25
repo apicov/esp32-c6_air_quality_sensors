@@ -6,7 +6,7 @@ SCD30::SCD30(i2c_master_bus_handle_t bus_handle, uint8_t address)
 	i2c_device_config_t dev_cfg = {
 		.dev_addr_length = I2C_ADDR_BIT_LEN_7,
 		.device_address = address_,
-		.scl_speed_hz = 100000,
+		.scl_speed_hz = 40000,
 	};
 
 	ESP_ERROR_CHECK(i2c_master_bus_add_device(bus_handle_, &dev_cfg, &dev_handle_));
@@ -226,6 +226,7 @@ esp_err_t SCD30::execute_cmd(uint16_t cmd, uint32_t timeout_ms,
         else
             ets_delay_us(timeout_ms * 1000);
     }
+
     if (in_data && in_words) {
         ret = read_resp(in_data, in_words);
         if (ret != ESP_OK)

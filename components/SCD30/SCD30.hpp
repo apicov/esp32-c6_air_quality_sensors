@@ -2,29 +2,42 @@
 
 #include <esp_err.h>
 #include <stdbool.h>
+#include <esp_log.h>
+#include "rom/ets_sys.h"
 
+// FreeRTOS
+#include <freertos/FreeRTOS.h>
 #include "driver/i2c_master.h"
+
+#define CMD_TRIGGER_CONTINUOUS_MEASUREMENT (0x0010)
+#define CMD_STOP_CONTINUOUS_MEASUREMENT (0x0104)
+#define CMD_SET_MEASUREMENT_INTERVAL (0x4600)
+#define CMD_GET_DATA_READY_STATUS (0x0202)
+#define CMD_READ_MEASUREMENT (0x0300)
+#define CMD_ACTIVATE_AUTOMATIC_SELF_CALIBRATION (0x5306)
+#define CMD_SET_FORCED_RECALIBRATION_VALUE (0x5204)
+#define CMD_SET_TEMPERATURE_OFFSET (0x5403)
+#define CMD_ALTITUDE_COMPENSATION (0x5102)
+#define CMD_READ_FIRMWARE_VERSION (0xD100)
+#define CMD_SOFT_RESET (0XD304)
+
+#define CHECK(x)                \
+    do                          \
+    {                           \
+        esp_err_t __;           \
+        if ((__ = x) != ESP_OK) \
+            return __;          \
+    } while (0)
+#define CHECK_ARG(VAL)                  \
+    do                                  \
+    {                                   \
+        if (!(VAL))                     \
+            return ESP_ERR_INVALID_ARG; \
+    } while (0)
 
 class SCD30 {
 public:
-    void SCD30(i2c_master_bus_handle_t bus_handle, uint8_t address);
-    /**
-     * @brief Initialize device descriptor.
-     *
-     * @param port     I2C port
-     * @param sda_gpio SDA GPIO
-     * @param scl_gpio SCL GPIO
-     * @return         `ESP_OK` on success
-     */
-    esp_err_t init_desc(i2c_port_t port, gpio_num_t sda_gpio, gpio_num_t scl_gpio);
-
-    /**
-     * @brief Free device descriptor.
-     *
-     * @return    `ESP_OK` on success
-     */
-    esp_err_t free_desc();
-
+    SCD30(i2c_master_bus_handle_t bus_handle, uint8_t address);
     /**
      * @brief Trigger continuous measurement.
      *
@@ -190,5 +203,15 @@ public:
     esp_err_t soft_reset();
 
 private:
-    i2c_dev_t dev; // Device descriptor
+    uint8_t address_;
+    i2c_master_bus_handle_t bus_handle_;
+    i2c_master_dev_handle_t dev_handle_;
+
+    uint8_t crc8(const uint8_t *data, size_t count);
+    uint16_t swap(uint16_t v);
+    esp_err_t send_cmd(uint16_t cmd, uint16_t *data, size_t words);
+    esp_err_t read_resp(uint16_t *data, size_t words);
+    esp_err_t execute_cmd(uint16_t cmd, uint32_t timeout_ms,
+            uint16_t *out_data, size_t out_words, uint16_t *in_data, size_t in_words);
+
 };
